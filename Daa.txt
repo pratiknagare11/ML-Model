@@ -1,0 +1,501 @@
+----------------------------------First--------------------------------------------------
+import java.math.BigInteger;
+import java.util.Scanner;
+
+public class First {
+    public static BigInteger RecursiveMultiply(BigInteger x, BigInteger y) {
+        if (x.compareTo(BigInteger.TEN) < 0 || y.compareTo(BigInteger.TEN) < 0) {
+            return x.multiply(y);
+        }
+        int length = Math.max(x.toString().length(), y.toString().length());
+        BigInteger power = BigInteger.TEN.pow(length / 2);
+        BigInteger x2 = x.mod(power);//ar
+        BigInteger x1 = x.divide(power);//al
+        BigInteger y2 = y.mod(power);//br
+        BigInteger y1 = y.divide(power);//bl
+        BigInteger p = RecursiveMultiply(x1, y1);
+        BigInteger r = RecursiveMultiply(x2, y2);
+        BigInteger q = RecursiveMultiply(x1.add(x2), y1.add(y2)).subtract(p)
+                .subtract(r);
+        return p.multiply(power.pow(2)).add(q.multiply(power)).add(r);
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the number: ");
+        BigInteger x = scanner.nextBigInteger();
+        BigInteger y = x;
+        BigInteger result = RecursiveMultiply(x, y);
+        System.out.print("The result is: " + result);
+        scanner.close();
+    }
+}
+
+
+----------------------------------------JobScheduling--------------------------------------------------
+
+import java.io.*;
+import java.util.*;
+
+class Job {
+    int id, profit, deadline;
+
+    Job(int x, int y, int z) {
+        this.id = x;
+        this.deadline = y;
+        this.profit = z;
+    }
+}
+
+class solve {
+
+    int[] JobScheduling(Job arr[], int n) {
+        Arrays.sort(arr, (a, b) -> (b.profit - a.profit));
+
+        int maxi = 0;
+        for (int i = 0; i < n; i++) {
+            if (arr[i].deadline > maxi) {
+                maxi = arr[i].deadline;
+            }
+        }
+
+        int result[] = new int[maxi + 1];
+        Arrays.fill(result, -1);
+
+        int countJobs = 0, jobProfit = 0;
+
+        for (int i = 0; i < n; i++) {
+            for (int j = arr[i].deadline; j > 0; j--) {
+                if (result[j] == -1) {
+                    result[j] = arr[i].id;
+                    countJobs++;
+                    jobProfit += arr[i].profit;
+                    break;
+                }
+            }
+        }
+
+        int ans[] = new int[2];
+        ans[0] = countJobs;
+        ans[1] = jobProfit;
+
+        System.out.println("Jobs: ");
+        for (int i = 0; i < maxi + 1; i++) {
+            if (result[i] != -1)
+                System.out.print(result[i] + " ");
+        }
+        System.out.println();
+
+        return ans;
+    }
+}
+
+public class JobScheduling {
+    public static void main(String[] args) throws IOException {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter the number of jobs:");
+        int numJobs = scanner.nextInt();
+
+        Job[] arr = new Job[numJobs];
+
+        System.out.println("Enter job details (id deadline profit):");
+        for (int i = 0; i < numJobs; i++) {
+            int id = scanner.nextInt();
+            int deadline = scanner.nextInt();
+            int profit = scanner.nextInt();
+
+            arr[i] = new Job(id, deadline, profit);
+        }
+
+        solve ob = new solve();
+
+        int[] res = ob.JobScheduling(arr, numJobs);
+
+        System.out.println("Number of jobs scheduled: " + res[0]);
+        System.out.println("Maximum profit: " + res[1]);
+
+        scanner.close();
+    }
+}
+
+// Enter the number of jobs:
+// 4
+// Enter job details (id deadline profit):
+// 1 2 150
+// 2 1 300
+// 3 2 200
+// 4 1 250
+// Jobs: 
+// 2 3 
+// Number of jobs scheduled: 2
+// Maximum profit: 500
+
+
+-----------------------------------------------Floyd--------------------------------------------------------
+import java.util.Scanner;
+
+public class FloydWarshal {
+    final static int INF = 99999; // Infinity as a placeholder for unreachable vertices
+
+    void floydWarshall(int dist[][], int V) {
+        for (int k = 0; k < V; k++) {
+            for (int i = 0; i < V; i++) {
+                for (int j = 0; j < V; j++) {
+                    if (dist[i][j] > dist[i][k] + dist[k][j]) {
+                        dist[i][j] = dist[i][k] + dist[k][j];
+                    }
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of offices (vertices): ");
+        int V = scanner.nextInt();
+
+        int[][] connectionCosts = new int[V][V];
+
+        System.out.println("Enter the connection costs between offices (Enter INF for unconnected offices):");
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                connectionCosts[i][j] = scanner.nextInt();
+            }
+        }
+
+        FloydWarshal FloydWarshal = new FloydWarshal();
+        FloydWarshal.floydWarshall(connectionCosts, V);
+
+        System.out.println("Minimum total cost to connect all offices:");
+        for (int i = 0; i < V; ++i) {
+            for (int j = 0; j < V; ++j) {
+                if (connectionCosts[i][j] != INF) {
+                    System.out.println("Office " + (i + 1) + " to Office " + (j + 1) + ": " + connectionCosts[i][j]);
+                }
+            }
+        }
+
+        scanner.close();
+    }
+}
+
+
+// Enter the number of offices (vertices): 3
+// Enter the connection costs between offices (Enter INF for unconnected offices):
+// 0 2 50
+// 100 0 3
+// 4 99999 0
+// Minimum total cost to connect all offices:
+// Office 1 to Office 1: 0
+// Office 1 to Office 2: 2
+// Office 1 to Office 3: 5
+// Office 2 to Office 1: 7
+// Office 2 to Office 2: 0
+// Office 2 to Office 3: 3
+// Office 3 to Office 1: 4
+// Office 3 to Office 2: 6
+// Office 3 to Office 3: 0
+
+
+
+-------------------------------------------------------Dijkstra-------------------------------------------------------
+
+import java.util.*;
+
+public class Dijkstra {
+    public static class Edge {
+        int src;
+        int dest;
+        int wt;
+
+        public Edge(int s, int d, int wt) {
+            this.src = s;
+            this.dest = d;
+            this.wt = wt;
+        }
+    }
+
+    public static void createGraph(ArrayList<Edge> graph[]) {
+        for (int i = 0; i < graph.length; i++) {
+            graph[i] = new ArrayList<>();
+        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the number of edges:");
+        int numEdges = sc.nextInt();
+        System.out.println("Enter edges (source destination weight):");
+        for (int i = 0; i < numEdges; i++) {
+            int src = sc.nextInt();
+            int dest = sc.nextInt();
+            int wt = sc.nextInt();
+            graph[src].add(new Edge(src, dest, wt));
+        }
+        // Do not close the Scanner here
+    }
+
+    static class Pair implements Comparable<Pair> {
+        int n;
+        int path;
+
+        Pair(int n, int path) {
+            this.n = n;
+            this.path = path;
+        }
+        
+        @Override
+        public int compareTo(Pair p2) {
+            return Integer.compare(this.path, p2.path);
+        }
+    }
+
+    public static void dijkstrasAlgo(ArrayList<Edge> graph[], int src) {
+        int dist[] = new int[graph.length];
+        boolean vis[] = new boolean[graph.length];
+        for (int i = 0; i < graph.length; i++) {
+            if (i != src) {
+                dist[i] = Integer.MAX_VALUE;
+            }
+        }
+        PriorityQueue<Pair> pq = new PriorityQueue<>();
+        pq.add(new Pair(src, 0));
+        while (!pq.isEmpty()) {
+            Pair curr = pq.remove();
+            if (!vis[curr.n]) {
+                vis[curr.n] = true;
+                for (int i = 0; i < graph[curr.n].size(); i++) {
+                    Edge e = graph[curr.n].get(i);
+                    int u = e.src;
+                    int v = e.dest;
+                    int wt = e.wt;
+
+                    if (dist[u] + wt < dist[v]) {
+                        dist[v] = dist[u] + wt;
+                        pq.add(new Pair(v, dist[v]));
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < dist.length; i++) {
+            System.out.println("Shortest distance from " + src + " to " + i + " is: " + dist[i] + " ");
+        }
+        System.out.println();
+    }
+
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the number of vertices:");
+        int v = sc.nextInt();
+        ArrayList<Edge> graph[] = new ArrayList[v];
+        createGraph(graph);
+        System.out.println("Enter the source vertex:");
+        int src = sc.nextInt();
+        sc.close(); // Close the Scanner after taking all input
+        dijkstrasAlgo(graph, src);
+    }
+}
+
+
+// Enter the number of vertices:
+// 6
+// Enter the number of edges:
+// 8
+// Enter edges (source destination weight):
+// 0 1 2
+// 0 2 4
+// 1 2 1
+// 1 3 7
+// 2 4 3
+// 3 5 1
+// 4 3 2
+// 4 5 5
+// Enter the source vertex:
+// 0
+// Shortest distance from 0 to 0 is: 0 
+// Shortest distance from 0 to 1 is: 2
+// Shortest distance from 0 to 2 is: 3
+// Shortest distance from 0 to 3 is: 8
+// Shortest distance from 0 to 4 is: 6
+// Shortest distance from 0 to 5 is: 9
+
+
+------------------------------------------------------------KnightTour-----------------------------------------------------
+
+import java.util.Scanner;
+
+public class KnightTour {
+    static int n;
+
+    static boolean isSafe(int x, int y, int[][] board) {
+        return (x >= 0 && y >= 0 && x < n && y < n && board[x][y] == -1);
+    }
+
+    static void printSolution(int n, int[][] board) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    static boolean solveKT(int n) {
+        int[][] board = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                board[i][j] = -1;
+            }
+        }
+        int[] move_x = { 2, 1, -1, -2, -2, -1, 1, 2 };
+        int[] move_y = { 1, 2, 2, 1, -1, -2, -2, -1 };
+        Scanner sc = new Scanner(System.in);
+        System.out.println("enter initial point:");
+        int a=sc.nextInt();
+        int b=sc.nextInt();
+        sc.close();
+        board[a][b] = 0;
+        int pos = 1;
+        if (!solveKTUtil(n, board, a, b, move_x, move_y, pos)) {
+            System.out.println("Solution does not exist");
+            return false;
+        } else {
+            printSolution(n, board);
+            return true;
+        }
+        
+    }
+
+    static boolean solveKTUtil(int n, int[][] board, int curr_x, int curr_y, int[] move_x, int[] move_y,
+            int pos) {
+        if (pos == n * n) {
+            return true;
+        }
+        for (int i = 0; i < 8; i++) {
+            int new_x = curr_x + move_x[i];
+            int new_y = curr_y + move_y[i];
+            if (isSafe(new_x, new_y, board)) {
+                board[new_x][new_y] = pos;
+                if (solveKTUtil(n, board, new_x, new_y, move_x, move_y, pos + 1)) {
+                    return true;
+                }
+                board[new_x][new_y] = -1;
+            }
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the size of the chessboard (n x n): ");
+        n = sc.nextInt();
+        solveKT(n);
+        sc.close();
+    }
+}
+
+
+
+-----------------------------------------------------JobAssignment-------------------------------------------------------
+
+
+import java.util.*;
+
+public class ClubAssignment {
+
+    public static class Node implements Comparable<Node> {
+
+        int cost;
+        int level;
+        int assigned[];
+        boolean[] visited;
+
+        Node(int cost, int level, int assigned[], boolean visited[]) {
+            this.cost = cost;
+            this.level = level;
+            this.assigned = assigned.clone();
+            this.visited = visited.clone();
+        }
+
+        public int compareTo(Node n) {
+            return this.cost - n.cost;
+        }
+
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the size of matrix :");
+        int n = sc.nextInt();
+
+        int mat[][] = new int[n][n];
+        System.out.println("Enter the matrix :");
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                mat[i][j] = sc.nextInt();
+            }
+        }
+
+        int mincost = findMinCost(mat);
+        System.out.println("Minimum cost is :" + mincost);
+
+    }
+
+    private static int findMinCost(int[][] mat) {
+        int n = mat.length;
+        int assigned[] = new int[n];
+
+        boolean visited[] = new boolean[n];
+
+        Arrays.fill(assigned, -1);
+
+        PriorityQueue<Node> pq = new PriorityQueue<Node>();
+        pq.add(new Node(0, -1, assigned, visited));
+
+        while (!pq.isEmpty()) {
+            Node min = pq.poll();
+            int i = min.level + 1;
+
+            if (i == n) {
+                printassignment(min, mat);
+                return min.cost;
+            }
+
+            for (int j = 0; j < n; j++) {
+                if (!min.visited[j]) {
+                    int newassigned[] = min.assigned.clone();
+                    boolean newvisited[] = min.visited.clone();
+                    newassigned[i] = j;
+                    newvisited[j] = true;
+                    Node child = new Node(min.cost + mat[i][j], i, newassigned, newvisited);
+                    pq.add(child);
+                }
+            }
+        }
+        return -1;
+    }
+
+    private static void printassignment(Node min, int[][] mat) {
+        for (int i = 0; i < min.assigned.length; i++) {
+            int club = min.assigned[i];
+            int cost = mat[i][club];
+            System.out.println("student " + (i + 1) + " is assined to club " + club + " with cost of " + cost);
+
+        }
+
+    }
+}
+
+
+// Enter the size of matrix :
+// 4
+// Enter the matrix :
+// 8 5 4 6
+// 1 3 7 5
+// 6 2 5 8
+// 7 3 7 6
+// student 1 is assined to club 2 with cost of 4
+// student 2 is assined to club 0 with cost of 1
+// student 3 is assined to club 1 with cost of 2
+// student 4 is assined to club 3 with cost of 6
+// Minimum cost is :13
